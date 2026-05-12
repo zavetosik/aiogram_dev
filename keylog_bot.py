@@ -1,3 +1,5 @@
+from mss import mss
+from aiogram.types import FSInputFile
 import asyncio
 from config import TOKEN, IDS
 import keyboard
@@ -15,6 +17,20 @@ dp = Dispatcher()
 async def start(message: Message):
     await message.answer("Введите текст")
 
+@dp.message(Command("screen"))
+async def screenshot(message: Message):
+
+    path = "screen.png"
+
+    with mss() as sct:
+        sct.shot(output=path)
+
+    photo = FSInputFile(path)
+
+    await message.answer_photo(photo, caption="на скрин уебок")
+
+
+
 @dp.message(Command("space"))
 async def space(message: Message):
     keyboard.write(" ")
@@ -31,11 +47,22 @@ async def write_text(message: Message):
         return
 
     if message.text:
-        keyboard.write(message.text)
-        await message.answer(f"Получилось, ты написал: {message.text}")
-    else:
-        await message.answer("пошел нахуй вместе со своим подсосуном")
 
+        if message.text.lower() == "enter":
+            keyboard.press_and_release("enter")
+            await message.answer("нажал enter")
+            return
+
+        if message.text.lower() == "win":
+            keyboard.press_and_release("win")
+            await message.answer("нажал win")
+            return
+
+
+        keyboard.write(message.text)
+
+        await message.answer(f"Получилось, ты написал: {message.text}")
+        print(message.text)
 
 
 async def main():
