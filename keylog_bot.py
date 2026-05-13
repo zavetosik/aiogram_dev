@@ -1,3 +1,5 @@
+from CONSTANTS import APPS
+import subprocess
 import webbrowser
 from mss import mss
 from aiogram.types import FSInputFile
@@ -35,6 +37,7 @@ async def open_youtube(message: Message):
 
 
 
+
 @dp.message(Command("screen"))
 async def screenshot(message: Message):
 
@@ -66,6 +69,15 @@ async def space(message: Message):
 async def write_text(message: Message):
     if not is_owner(message):
         await message.answer("ты ниче не можеш")
+
+        return
+
+    text = message.text.lower()
+
+    if text in APPS:
+        subprocess.Popen(APPS[text])
+
+        await message.answer(f"открыл {text}")
 
         return
 
