@@ -58,9 +58,25 @@ async def start(message: Message):
         await message.answer(f"@{username} регистрация прошла успешно")
 
 
-# @dp.message(Command("profile"))
-# async def get_profile(message: Message):
+@dp.message(Command("profile"))
+async def get_profile(message: Message):
 
+    user_id = message.from_user.id
+    username = message.from_user.username
+    name = message.from_user.first_name
+
+    cursor.execute(
+        "SELECT * FROM users WHERE telegram_id = ?",
+        (user_id,)
+    )
+
+    user = cursor.fetchone()
+
+    if user:
+        await message.answer(f"id: {user_id}\nusername: @{username}\nname: {name}")
+
+    else:
+        await message.answer("Напишите команду /start для регистрации")
 
 
 
