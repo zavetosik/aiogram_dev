@@ -4,6 +4,7 @@ import sqlite3
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
+from aiogram.filters import Command
 from aiogram.types import Message
 
 
@@ -41,7 +42,7 @@ async def start(message: Message):
     user = cursor.fetchone()
 
     if user:
-        await message.answer("Ты уже зарегистрирован")
+        await message.answer(f"@{username} ты уже зарегистрирован в нашем боте")
 
     else:
         cursor.execute(
@@ -54,7 +55,16 @@ async def start(message: Message):
 
         conn.commit()
 
-        await message.answer("Регистрация успешна")
+        await message.answer(f"@{username} регистрация прошла успешно")
+
+
+# @dp.message(Command("profile"))
+# async def get_profile(message: Message):
+
+
+
+
+
 
 
 async def main():
