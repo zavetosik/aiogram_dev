@@ -62,19 +62,19 @@ async def do_start(message: Message):
     user = cursor.fetchone()
 
     if user:
-        if username:
-            await message.answer(f"@{username} регистрация прошла успешно")
-        else:
-            await message.answer(f"{name} регистрация прошла успешно")
+
+        await message.answer("Ты уже зарегистрирован")
 
         cursor.execute("""
         UPDATE users
         SET username = ?, name = ?
-        WHERE telegram_id = ?""", (username, name, user_id))
+        WHERE telegram_id = ?
+        """, (username, name, user_id))
 
         conn.commit()
 
     else:
+
         cursor.execute(
             """
             INSERT INTO users (telegram_id, username, name)
@@ -85,7 +85,15 @@ async def do_start(message: Message):
 
         conn.commit()
 
-        await message.answer(f"@{username} регистрация прошла успешно")
+        if username:
+            await message.answer(
+                f"@{username} регистрация прошла успешно"
+            )
+
+        else:
+            await message.answer(
+                f"{name} регистрация прошла успешно"
+            )
 
 
 @dp.message(Command("profile"))
@@ -158,7 +166,7 @@ async def make_broadcast(message: Message):
     SELECT telegram_id
     FROM users""")
     users = cursor.fetchall()
-    text = message.text.replace("/broadcast", "")
+    text = message.text.replace("/broadcast", "").strip()
     if not text:
         await message.answer("Напиши текст для рассылки")
     else:
