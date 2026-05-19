@@ -1,3 +1,5 @@
+import csv
+from datetime import datetime
 from utils import is_owner
 from config import TOKEN
 import asyncio
@@ -120,11 +122,30 @@ async def get_all_users(message: Message):
         text += (
             f" ID DB: {user[0]}\n"
             f" ID: {user[1]}\n"
-            f" Username: {user[2]}\n"
+            f" Username: {user[2] or "-"}\n"
             f" Name: {user[3]}\n\n"
         )
 
     await message.answer(text)
+
+@dp.message(Command("broadcast"))
+async def make_broadcast(message: Message):
+    if not is_owner(message):
+        await message.answer("У тебя нету прав!")
+        return
+    cursor.execute("""
+    SELECT telegram_id
+    FROM users""")
+    users = cursor.fetchall()
+    text = message.text.replace("/broadcast", "")
+    if not text:
+        await message.answer("Напиши текст для рассылки")
+    else:
+        for user in users:
+            await bot.send_message(user[0], text)
+
+
+
 
 @dp.message(Command("admin"))
 async def get_admin_info(message: Message):
@@ -132,7 +153,8 @@ async def get_admin_info(message: Message):
         await message.answer("У тебя нету прав!")
         return
     await message.answer("/users - показывает число зарегистрированных пользователей\n"
-                         "/all_users - показывает данные всех пользователей")
+                         "/all_users - показывает данные всех пользователей\n"
+                         "/broadcast - делает рассылку сообщения")
 
 
 
