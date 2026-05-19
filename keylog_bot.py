@@ -6,7 +6,7 @@ from aiogram.types import FSInputFile
 import asyncio
 from config import TOKEN, IDS
 import keyboard
-from utils import is_owner
+from utils import is_admin
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
@@ -21,14 +21,14 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def start(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("ты ниче не можеш")
         return
     await message.answer("Введите текст")
 
 @dp.message(Command("youtube"))
 async def open_youtube(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("ты ниче не можеш")
         return
     webbrowser.open("https://www.youtube.com/")
@@ -41,7 +41,7 @@ async def open_youtube(message: Message):
 @dp.message(Command("screen"))
 async def screenshot(message: Message):
 
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("ты ниче не можеш")
         return
 
@@ -58,7 +58,7 @@ async def screenshot(message: Message):
 
 @dp.message(Command("space"))
 async def space(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("ты ниче не можеш")
         return
     keyboard.write(" ")
@@ -67,7 +67,7 @@ async def space(message: Message):
 
 @dp.message()
 async def write_text(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("ты ниче не можеш")
 
         return
@@ -101,6 +101,7 @@ async def write_text(message: Message):
 
 
 async def main():
-    await dp.start_polling(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, skip_updates=True)
 
 asyncio.run(main())

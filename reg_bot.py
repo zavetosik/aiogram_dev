@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from utils import is_owner, write_logs
+from utils import is_admin, write_logs
 from config import TOKEN
 import asyncio
 import sqlite3
@@ -10,12 +10,14 @@ from aiogram.filters import CommandStart
 from aiogram.filters import Command
 from aiogram.types import Message
 
-
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 conn = sqlite3.connect("bot.db")
 cursor = conn.cursor()
+
+
+
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
@@ -26,8 +28,28 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-conn.commit()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS admins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    telegram_id INTEGER UNIQUE
+)
+""")
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS owners (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    telegram_id INTEGER UNIQUE
+
+)
+""")
+
+
+# cursor.execute('''
+# INSERT INTO owners (telegram_id)
+# VALUES (1193137732)''')
+
+conn.commit()
 
 @dp.message(CommandStart())
 async def do_start(message: Message):
@@ -93,7 +115,7 @@ async def get_profile(message: Message):
 
 @dp.message(Command("users"))
 async def get_users(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("У тебя нету прав!")
         return
     cursor.execute("""
@@ -107,7 +129,7 @@ async def get_users(message: Message):
 
 @dp.message(Command("all_users"))
 async def get_all_users(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("У тебя нету прав!")
         return
     cursor.execute("""
@@ -134,7 +156,7 @@ async def get_all_users(message: Message):
 
 @dp.message(Command("broadcast"))
 async def make_broadcast(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("У тебя нету прав!")
         return
     cursor.execute("""
@@ -147,7 +169,7 @@ async def make_broadcast(message: Message):
     else:
         for user in users:
             await bot.send_message(user[0], text)
-    write_logs(
+        write_logs(
         message.from_user.id,
         message.from_user.username,
         text
@@ -158,15 +180,9 @@ async def make_broadcast(message: Message):
 
 
 
-
-
-
-
-
-
 @dp.message(Command("admin"))
 async def get_admin_info(message: Message):
-    if not is_owner(message):
+    if not is_admin(message):
         await message.answer("У тебя нету прав!")
         return
     await message.answer("/users - показывает число зарегистрированных пользователей\n"
@@ -180,7 +196,8 @@ async def get_admin_info(message: Message):
 
 
 async def main():
-    await dp.start_polling(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, skip_updates=True)
 
 
 asyncio.run(main())

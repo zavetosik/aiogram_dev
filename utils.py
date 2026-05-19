@@ -4,7 +4,7 @@ from config import IDS
 from aiogram.types import Message
 
 
-def is_owner(message: Message):
+def is_admin(message: Message):
     return message.from_user.id in IDS
 
 def write_logs(admin_id, username, text):
