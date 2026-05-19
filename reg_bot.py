@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from utils import is_admin, write_logs
+from utils import is_admin, is_owner, write_logs
 from config import TOKEN
 import asyncio
 import sqlite3
@@ -44,10 +44,6 @@ CREATE TABLE IF NOT EXISTS owners (
 )
 """)
 
-
-# cursor.execute('''
-# INSERT INTO owners (telegram_id)
-# VALUES (1193137732)''')
 
 conn.commit()
 
@@ -142,10 +138,10 @@ async def get_all_users(message: Message):
 
     for user in users:
         text += (
-            f" ID DB: {user[0]}\n"
-            f" ID: {user[1]}\n"
-            f" Username: {user[2] or "-"}\n"
-            f" Name: {user[3]}\n\n"
+            f"ID DB: {user[0]}\n"
+            f"ID: {user[1]}\n"
+            f"Username: @{user[2] or '-'}\n"
+            f"Name: {user[3]}\n\n"
         )
 
     await message.answer(text)
@@ -174,6 +170,8 @@ async def make_broadcast(message: Message):
         message.from_user.username,
         text
     )
+@dp.message(Command("add_admin"))
+
 
 
 
@@ -188,9 +186,6 @@ async def get_admin_info(message: Message):
     await message.answer("/users - показывает число зарегистрированных пользователей\n"
                          "/all_users - показывает данные всех пользователей\n"
                          "/broadcast - делает рассылку сообщения")
-
-
-
 
 
 
