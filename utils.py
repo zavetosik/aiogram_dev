@@ -37,3 +37,16 @@ def write_logs(admin_id, username, text):
     with open("logs.csv", "a", encoding="utf-8") as file:
         log = f"{datetime.now()};{admin_id};{username};{text}\n"
         file.write(log)
+
+def write_admin_logs(action, admin_id, target_id):
+
+    with open("admin_logs.csv", "a", encoding="utf-8") as file:
+
+        log = (
+            f"{datetime.now()};"
+            f"{action};"
+            f"{admin_id};"
+            f"{target_id}\n"
+        )
+
+        file.write(log)

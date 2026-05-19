@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from utils import is_admin, is_owner, write_logs
+from utils import is_admin, is_owner, write_logs, write_admin_logs
 from config import TOKEN
 import asyncio
 import sqlite3
@@ -201,6 +201,11 @@ async def add_admin(message: Message):
             (admin_id,)
         )
         await message.answer("Админ успешно добавлен")
+        write_admin_logs(
+            "add_admin",
+            message.from_user.id,
+            admin_id
+        )
     conn.commit()
 
 @dp.message(Command("remove_admin"))
@@ -224,6 +229,11 @@ async def remove_admin(message: Message):
             (admin_id,)
         )
         await message.answer("Админ успешно удален")
+        write_admin_logs(
+            "remove_admin",
+            message.from_user.id,
+            admin_id
+        )
     else:
         await message.answer("Такой админ не найден")
     conn.commit()
