@@ -49,7 +49,6 @@ conn.commit()
 
 @dp.message(CommandStart())
 async def do_start(message: Message):
-    print(message.text)
 
     user_id = message.from_user.id
     username = message.from_user.username
@@ -90,7 +89,7 @@ async def do_start(message: Message):
 
 
 @dp.message(Command("profile"))
-async def get_profile(message: Message):
+async def show_profile(message: Message):
 
     user_id = message.from_user.id
     username = message.from_user.username
@@ -171,8 +170,55 @@ async def make_broadcast(message: Message):
         text
     )
 @dp.message(Command("add_admin"))
+async def add_admin(message: Message):
+    if not is_owner(message):
+        await message.answer("У тебя нету прав!")
+        return
+    admin_id = message.text.replace("/add_admin", "").strip()
+    if not admin_id:
+        await message.answer("Укажи ID пользователя")
+        return
+    admin_id = int(admin_id)
+    cursor.execute(
+        "SELECT * FROM admins WHERE telegram_id = ?",
+        (admin_id,)
+    )
+    admin = cursor.fetchone()
+    if admin:
+        await message.answer("Этот пользователь уже админ")
+        return
+    else:
+        cursor.execute(
+            "INSERT INTO admins (telegram_id) VALUES (?)",
+            (admin_id,)
+        )
+        await message.answer("Админ успешно добавлен")
+    conn.commit()
 
-
+@dp.message(Command("remove_admin"))
+async def remove_admin(message: Message):
+    if not is_owner(message):
+        await message.answer("У тебя нету прав!")
+        return
+    admin_id = message.text.replace("/remove_admin", "").strip()
+    if not admin_id:
+        await message.answer("Укажи ID админа")
+        return
+    admin_id = int(admin_id)
+    cursor.execute(
+        "SELECT * FROM admins WHERE telegram_id = ?",
+        (admin_id,)
+    )
+    admin = cursor.fetchone()
+    if admin:
+        cursor.execute(
+            "DELETE FROM admins WHERE telegram_id = ?",
+            (admin_id,)
+        )
+        await message.answer("Админ успешно удален")
+    else:
+        await message.answer("Такой админ не найден")
+    conn.commit()
 
 
 
