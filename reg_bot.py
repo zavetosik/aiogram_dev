@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from utils import is_owner
+from utils import is_owner, write_logs
 from config import TOKEN
 import asyncio
 import sqlite3
@@ -128,6 +128,10 @@ async def get_all_users(message: Message):
 
     await message.answer(text)
 
+
+
+
+
 @dp.message(Command("broadcast"))
 async def make_broadcast(message: Message):
     if not is_owner(message):
@@ -143,6 +147,19 @@ async def make_broadcast(message: Message):
     else:
         for user in users:
             await bot.send_message(user[0], text)
+    write_logs(
+        message.from_user.id,
+        message.from_user.username,
+        text
+    )
+
+
+
+
+
+
+
+
 
 
 
