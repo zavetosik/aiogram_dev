@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from utils import is_admin, is_owner, write_logs, write_admin_logs
+from utils import is_admin, is_owner, is_user, write_logs, write_admin_logs
 from config import TOKEN
 import asyncio
 import sqlite3
@@ -157,26 +157,6 @@ async def get_all_users(message: Message):
 
 
 
-@dp.message(Command("broadcast"))
-async def make_broadcast(message: Message):
-    if not is_admin(message):
-        await message.answer("У тебя нету прав!")
-        return
-    cursor.execute("""
-    SELECT telegram_id
-    FROM users""")
-    users = cursor.fetchall()
-    text = message.text.replace("/broadcast", "").strip()
-    if not text:
-        await message.answer("Напиши текст для рассылки")
-    else:
-        for user in users:
-            await bot.send_message(user[0], text)
-        write_logs(
-        message.from_user.id,
-        message.from_user.username,
-        text
-    )
 @dp.message(Command("add_admin"))
 async def add_admin(message: Message):
     if not is_owner(message):
@@ -238,6 +218,61 @@ async def remove_admin(message: Message):
         await message.answer("Такой админ не найден")
     conn.commit()
 
+@dp.message(Command("send"))
+async def send_confession(message: Message):
+    if not is_user(message):
+        await message.answer("Для начала напиши /start")
+        return
+
+    cursor.execute(
+        "SELECT telegram_id FROM admins")
+
+    admins = cursor.fetchall()
+    text = message.text.replace("/send", "").strip()
+    if not text:
+        await message.answer("Напишите текст для поста")
+    else:
+        for admin in admins:
+            await bot.send_message(
+                admin[0],
+                f"""
+            📩 Новый пост
+
+            👤 Username: @{message.from_user.username}
+            🆔 ID: {message.from_user.id}
+
+            💌 Text:
+            {text}
+            """
+            )
+
+
+
+
+
+
+
+
+@dp.message(Command("broadcast"))
+async def make_broadcast(message: Message):
+    if not is_admin(message):
+        await message.answer("У тебя нету прав!")
+        return
+    cursor.execute("""
+    SELECT telegram_id
+    FROM users""")
+    users = cursor.fetchall()
+    text = message.text.replace("/broadcast", "").strip()
+    if not text:
+        await message.answer("Напиши текст для рассылки")
+    else:
+        for user in users:
+            await bot.send_message(user[0], text)
+        write_logs(
+        message.from_user.id,
+        message.from_user.username,
+        text
+    )
 
 
 
@@ -253,10 +288,10 @@ async def get_admin_info(message: Message):
 
 
 
-
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, skip_updates=True)
 
 
 asyncio.run(main())
+
