@@ -1,38 +1,43 @@
-from config import TOKEN, GROQ_API_KEY
-# from aiogram import Bot, Dispatcher
-# from aiogram.types import Message
-# from aiogram.filters import CommandStart, Command
-#
-#
-# from groq import Groq
-#
-# client = Groq(api_key=GROQ_API_KEY)
-#
-#
+from pydoc import text
 
-
+from groq import Groq
 import asyncio
-from groq import AsyncGroq
 
+from config import TOKEN, GROQ_API_KEY
+from aiogram import Bot, Dispatcher, F
+from aiogram.filters import CommandStart, Command
+from aiogram.types import Message
 
-async def main():
-    client = AsyncGroq(api_key=GROQ_API_KEY)  # Ключ подтянется из окружения
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-    # 1. Просим пользователя ввести текст с клавиатуры
-    user_question = input("Напиши свой вопрос для нейросети: ")
+client = Groq(api_key=GROQ_API_KEY)
 
-    # 2. Подставляем ПЕРЕМЕННУЮ user_question вместо жестко заданного текста
-    dialog = [
-        {"role": "system", "content": "Ты полезный ассистент."},
-        {"role": "user", "content": user_question}
-    ]
+@dp.message(Command("ai"))
+async def ai_chat(message: Message):
 
-    response = await client.chat.completions.create(
+    text = message.text.replace("ai", "").strip()
+    if not text:
+        await message.answer("Напиши сообщение")
+        return
+    response = client.chat.completions.create(
+
         model="llama-3.3-70b-versatile",
-        messages=dialog
+
+        messages=[
+            {
+                "role": "user",
+                "content": text
+            }
+        ]
+
     )
 
-    print("Ответ Groq:", response.choices[0].message.content)
+    ai_response = response.choices[0].message.content
 
+    await message.answer(ai_response)
+
+async def main():
+    await dp.start_polling(bot)
 
 asyncio.run(main())

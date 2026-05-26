@@ -56,11 +56,6 @@ CREATE TABLE IF NOT EXISTS posts (
 )
 """)
 
-
-conn.commit()
-
-
-
 conn.commit()
 
 @dp.message(CommandStart())
