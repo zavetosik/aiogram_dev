@@ -491,7 +491,26 @@ async def get_admin_info(message: Message):
     "/broadcast - делает рассылку сообщения"
     )
 
+@dp.message(Command("all_admins"))
+async def get_all_admins(message: Message):
+    if not is_admin(message):
+        await message.answer("У тебя нету прав!")
+        return
+    cursor.execute("""
+    SELECT id, telegram_id
+    FROM admins
+    """)
+    admins = cursor.fetchall()
 
+    text = ""
+
+    for admin in admins:
+        text += (
+            f"ID DB: {admin[0]}\n"
+            f"ID: {admin[1]}\n\n"
+        )
+
+    await message.answer(text)
 
 
 
