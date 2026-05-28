@@ -512,6 +512,5 @@ async def get_all_admins(message: Message):
 async def main():
     await dp.start_polling(bot)
 
-
 asyncio.run(main())
 

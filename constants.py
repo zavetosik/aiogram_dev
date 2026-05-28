@@ -7,3 +7,6 @@ APPS = {
     "notepad": "notepad.exe",
     "calc": "calc.exe"
 }
+
+
+WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"

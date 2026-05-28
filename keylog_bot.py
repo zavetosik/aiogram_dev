@@ -1,4 +1,4 @@
-from CONSTANTS import APPS
+from constants import APPS
 import subprocess
 import webbrowser
 from mss import mss

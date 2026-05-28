@@ -1,5 +1,3 @@
-from pydoc import text
-
 from groq import Groq
 import asyncio
 
@@ -16,7 +14,7 @@ client = Groq(api_key=GROQ_API_KEY)
 @dp.message(Command("ai"))
 async def ai_chat(message: Message):
 
-    text = message.text.replace("ai", "").strip()
+    text = message.text.replace("ai", "").strip() if message.text else None
     if not text:
         await message.answer("Напиши сообщение")
         return
@@ -30,7 +28,6 @@ async def ai_chat(message: Message):
                 "content": text
             }
         ]
-
     )
 
     ai_response = response.choices[0].message.content
