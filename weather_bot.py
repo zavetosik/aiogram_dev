@@ -1,6 +1,6 @@
 import json
 import requests
-from constants import WEATHER_URL
+from constants import WEATHER_URL, CURRENCIES
 from config import TOKEN, TEST_TOKEN, WEATHER_API, CURRENCY_API
 import asyncio
 from twelvedata import TDClient
@@ -84,15 +84,23 @@ async def check_currency(message: Message):
 
     currency = message.text.replace("/check_currency ", "").strip()
 
-    try:
-        data = td.price(symbol=currency).as_json()
-        print(data["price"])
-        price = round(float(data["price"]), 2)
+    if currency not in CURRENCIES:
+        await message.answer(
+            "Такая валютная пара не поддерживается"
+        )
+        return
+    data = td.price(symbol=currency).as_json()
+    print(data["price"])
+    price = round(float(data["price"]), 2)
+    await message.answer(f"Курс равняется: {price}")
 
-        await message.answer(f"Курс равняется: {price}")
+@dp.message(Command("currencies"))
+async def get_currencies(message: Message):
+    await message.answer(
+        "Доступные валютные пары:\n\n" +
+        "\n\n".join(CURRENCIES)
+    )
 
-    except TwelveDataError:
-        await message.answer("Введите правильную валюту")
 
 
 async def main():

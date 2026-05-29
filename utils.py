@@ -13,7 +13,7 @@ def is_admin(message: Message):
         (user_id,)
     )
     admin = cursor.fetchone()
-    if admin:
+    if admin:   
         return True
     else:
         return False
