@@ -1,7 +1,7 @@
-import csv
 from datetime import datetime
 from aiogram.types import Message
 import sqlite3
+
 
 
 def is_admin(message: Message):
@@ -45,10 +45,6 @@ def is_user(message: Message):
         return True
     else:
         return False
-
-
-
-
 
 
 def write_logs(admin_id, username, text):
