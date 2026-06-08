@@ -1,7 +1,9 @@
-
+import csv
+from datetime import datetime
 from utils import is_admin, is_owner, is_user, write_logs, write_admin_logs
 from config import TOKEN, CHANNEL_ID
 import asyncio
+import sqlite3
 from database import cursor, conn
 
 from aiogram import Bot, Dispatcher, F
@@ -11,6 +13,9 @@ from aiogram.types import Message
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+conn = sqlite3.connect("bot.db")
+cursor = conn.cursor()
 
 
 cursor.execute("""
